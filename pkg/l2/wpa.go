@@ -47,6 +47,7 @@ type WPA struct {
 	Interfaces map[string]*WifiInterface
 
 	mux *msgs.Mux `json:"-"`
+	l2  *L2
 }
 
 type WifiInterface struct {
@@ -65,7 +66,9 @@ type WifiInterface struct {
 
 	// Used internally to match commands with responses.
 	currentCommandResponse chan string
-	cmdMutex               sync.Mutex
+
+	// Held while a command is active. Usually commands return immediately.
+	cmdMutex sync.Mutex
 
 	// P2PFind in progress.
 	scanning bool
@@ -108,6 +111,7 @@ func (l2 *L2) NewWPA(baseDir string, refresh int, ap string) (*WPA, error) {
 	res := &WPA{
 		Interfaces: map[string]*WifiInterface{},
 		mux:        l2.mux,
+		l2:         l2,
 	}
 
 	for _, n := range names {

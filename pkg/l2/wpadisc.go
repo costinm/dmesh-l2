@@ -13,7 +13,10 @@ import (
 	//"github.com/costinm/dmesh/dm/mesh"
 )
 
-// DNS-SD support, used with WPA
+// Minimal DNS-SD support, used to parse WPA "P2P-SERV-DISC-RESP" for older Android versions.
+// From Android Q, the P2P uses a fixed prefix (DIRECT-DM-ESH-) and fixed PSK - encryption is at L6,
+// we don't rely on link-local encryption.
+// Older Android devices use a special TXT record to advertise the PSK and SSID (and few other things)
 
 var (
 	dnsErr = errors.New("DNS")

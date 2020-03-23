@@ -3,6 +3,9 @@
 GO = /a/opt/go/bin/go
 OUT ?= .
 
+# ARM/MIPS binaries - about 11MB
+#
+
 all:
 	GOARCH=mips GOOS=linux GOMIPS=softfloat ${GO} build -ldflags="-s -w" -o ${OUT}/bin/mips/dml2 .
 	GOARCH=arm GOOS=linux GOARM=7 ${GO} build -ldflags="-s -w" -o ${OUT}/bin/arm/dml2 .

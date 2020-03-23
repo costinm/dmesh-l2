@@ -69,13 +69,10 @@ tshark -i wlan0 -I -J IEE802_11_RADIO -n -s0 -f "wlan type mgt subtype 0xd0 and 
 // fork of docker/libcontainer, which now uses it (opencontainers/runc/libcontainer)
 //
 
-var (
-	w *wifi.Client
-)
-
 // Make sure each Phy device has a mon interface.
 // Open for read each mon interface.
-func (l2 *L2) setupMonInterfaces(client *wifi.Client) error {
+func (l2 *L2) setupMonInterfaces() error {
+	client := l2.netLinkWifi
 	// Find phy - we'll use a mon for each
 	phys, err := client.Phys()
 	if err != nil {
@@ -165,9 +162,9 @@ func (l2 *L2) InitWifi() error {
 		log.Println("Error initializing wifi ", err)
 		return err
 	}
-	w = client
+	l2.netLinkWifi = client
 
-	err = l2.setupMonInterfaces(client)
+	err = l2.setupMonInterfaces()
 	if err != nil {
 		log.Println("Error initializing wifi ", err)
 		return err

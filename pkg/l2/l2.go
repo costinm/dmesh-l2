@@ -24,7 +24,8 @@ type L2 struct {
 	// List of active wifi interfaces - STA, AP, etc - excluding monitors
 	actWifi []*wifi.Interface
 	// Monitor interfaces
-	physMon map[int]*wifi.Interface
+	physMon     map[int]*wifi.Interface
+	netLinkWifi *wifi.Client
 }
 
 func NewL2(mux *msgs.Mux) *L2 {

@@ -2,7 +2,7 @@ module github.com/costinm/dmesh-l2
 
 go 1.14
 
-//replace github.com/costinm/wpgate => ../wpgate
+replace github.com/costinm/wpgate => ../wpgate
 
 require (
 	github.com/costinm/wpgate v0.0.0-20200310154919-3cd18aaa0415

@@ -92,8 +92,16 @@ func (c *WifiInterface) onEvent(cmd string, data []byte, isp2pif bool) {
 		// Other apps may set different service discovery params. Leaving one active
 		// results in dups.
 		log.Println("WPA_IN: ", p2pif, parts)
-		c.SendCommand("P2P_SERV_DISC_CANCEL_REQ " + c.pendingDisc)
-		go c.SendCommand("SCAN")
+
+		// Results seems to be sent after this commands times out ? No wait for response maybe,
+		// and have a small delay ?
+		c.sendCommandTO("P2P_SERV_DISC_CANCEL_REQ "+c.pendingDisc, true, 0*time.Second)
+
+		// Sometimes P2P-DEVICE-FOUND happens after P2P-FIND_STOPPED !
+
+		// Normally a scan is completed as part of p2p discovery
+		//go c.SendCommand("SCAN")
+		go c.sendScanResults()
 
 	case "CTRL-EVENT-SCAN-STARTED":
 		// Sent at start of both scan and find ( find does a scan first )
@@ -369,6 +377,8 @@ func (c *WifiInterface) ListNetworks() ([]*WPANetwork, error) {
 }
 
 // start peer discovery with DNSSD. Events will be sent, discovery will auto-terminate
+// Uses a hard-coded time of 6 seconds ( TODO: and override )
+//
 func (c *WifiInterface) P2PDiscover() {
 	//wpa.ListNetworks()
 	// list all discovery protocols
@@ -381,14 +391,14 @@ func (c *WifiInterface) P2PDiscover() {
 	}
 	c.pendingDisc = res
 
-	res, err = c.SendCommandP2P("P2P_FIND 6")
+	res, err = c.SendCommandP2P("P2P_FIND 12")
 	if err != nil {
 		log.Println("Error P2P_SERV_DISC_REQ", err, res)
 	}
 }
 
 func (c *WifiInterface) Scan() {
-	res, err := c.SendCommand("SCAN")
+	res, err := c.sendCommandTO("SCAN", false, 3*time.Second)
 	if err != nil {
 		log.Println("SCAN", err, res)
 		return
@@ -498,6 +508,10 @@ func (c *WifiInterface) SendCommand(command string) (string, error) {
 }
 
 func (c *WifiInterface) sendCommand(command string, p2p bool) (string, error) {
+	return c.sendCommandTO(command, p2p, 5*time.Second)
+}
+
+func (c *WifiInterface) sendCommandTO(command string, p2p bool, t time.Duration) (string, error) {
 	c.cmdMutex.Lock()
 	defer c.cmdMutex.Unlock()
 
@@ -522,7 +536,10 @@ func (c *WifiInterface) sendCommand(command string, p2p bool) (string, error) {
 		return "", err
 	}
 
-	a := time.After(5 * time.Second)
+	if t == 0 {
+		return "", nil
+	}
+	a := time.After(t)
 	select {
 	case resp := <-c.currentCommandResponse:
 		t2 := time.Now()
@@ -531,7 +548,7 @@ func (c *WifiInterface) sendCommand(command string, p2p bool) (string, error) {
 		}
 		return resp, nil
 	case <-a:
-		log.Println("WPA_TIMEOUT", command)
+		log.Println("WPA_TIMEOUT", p2p, command)
 		return "", errors.New("Timeout")
 	}
 }
