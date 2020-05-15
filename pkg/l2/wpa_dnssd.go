@@ -119,7 +119,7 @@ func parseDisc(msg []string, d *mesh.MeshDevice) bool {
 	d.SSID = meta["s"]
 	d.Net = meta["c"]
 
-	log.Println("DNS_SD: ", meta)
+	log.Println("WPA/DNS: ", meta)
 	return true
 }
 

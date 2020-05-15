@@ -40,9 +40,12 @@ func main() {
 	}
 
 	wpa, err := l2main.NewWPA(wpaDir, 0, os.Getenv("AP"))
-
-	// Messages on the wifi topic, received on the mux.
-	mux.AddHandler("wifi", wpa)
+	if err != nil {
+		log.Print("Failed to open WPA ", err)
+	} else {
+		// Messages on the wifi topic, received on the mux.
+		mux.AddHandler("wifi", wpa)
+	}
 
 	_, err = l2main.InitBLE()
 	if err != nil {

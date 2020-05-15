@@ -127,9 +127,12 @@ func (c *Client) StartReceive() {
 				case nl80211.CmdFrameTxStatus:
 					nani := NanClients[intf]
 					if nani != nil {
+						// Typical when connected on different band:
+						//  <2m sent, ~50ms to ack (likely due to switching band
+						// at the right time). 200ms is common too.
 						sinceSent := time.Now().Sub(nani.LastSent)
-						if nani.LastSentTime.Milliseconds() > 1 ||
-							sinceSent.Milliseconds() > 10 {
+						if nani.LastSentTime.Milliseconds() > 5 ||
+							sinceSent.Milliseconds() > 300 {
 							log.Println("TX: ", nani.IFace.Name,
 								sinceStart, "tAck", sinceSent,
 								"tSend", nani.LastSentTime)

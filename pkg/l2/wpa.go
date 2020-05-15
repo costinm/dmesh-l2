@@ -77,7 +77,7 @@ type WifiInterface struct {
 	pendingDisc string
 
 	// Last scan results (raw). Includes known and DIRECT networks.
-	LastScan *mesh.L2
+	LastScan *mesh.L2NetStatus
 	ScanTime time.Time
 
 	// Keep track of discovered P2P devices.
@@ -273,7 +273,7 @@ func DialWPA(wpap *WPA, base, ifname string, refreshSeconds int, ap string) (*Wi
 // wpa - low level wpa command, "i" and "c" params
 //
 func (c *WPA) HandleMessage(ctx context.Context, cmd string, meta map[string]string, data []byte) {
-	log.Printf("/wpa/HANDLE %s %v", cmd, meta)
+	log.Printf("WPA/MSG/HANDLE %s %v", cmd, meta)
 
 	parts := strings.Split(cmd, "/")
 	if len(parts) < 2 || parts[1] != "wifi" {
@@ -380,7 +380,7 @@ func (c *WifiInterface) sendScanResults() {
 		log.Println("Scan results none: ", lines)
 		return
 	}
-	s := &mesh.L2{}
+	s := &mesh.L2NetStatus{}
 
 	for i := 1; i < len(lines); i++ {
 		parts := strings.Split(lines[i], "\t")

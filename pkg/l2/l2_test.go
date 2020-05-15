@@ -50,7 +50,7 @@ func connectL2Host(path string) {
 
 }
 
-// Send and receive L2 frames using NAN/WifiAware encapsulation
+// Send and receive L2NetStatus frames using NAN/WifiAware encapsulation
 //
 // Should interoperate with Android and ESP32 if the interface is on channel 6
 //
@@ -73,10 +73,10 @@ func TestWifiAware(t *testing.T) {
 
 }
 
-func testScan(t *testing.T) {
+func disc(t *testing.T) {
 }
 
-// Send and receive L2 frames using a WifiDirect/P2P connection.
+// Send and receive L2NetStatus frames using a WifiDirect/P2P connection.
 // Devices are both assumed to be in link local mode.
 //
 func TestWifiDirect(t *testing.T) {
@@ -89,7 +89,7 @@ func TestWifiDirect(t *testing.T) {
 	log.Println("WPA", wpa.Interfaces)
 
 	// WPA is controlled via messages.
-	scan := &l2api.L2{}
+	scan := &l2api.L2NetStatus{}
 	t.Run("scan", func(t *testing.T) {
 		for i := 0; i < 4; i++ {
 			log.Println("Send scan request ")
@@ -164,9 +164,12 @@ func TestWifiDirect(t *testing.T) {
 		}
 	})
 
+	t.Run("startAP", func(t *testing.T) {
+
+	})
 }
 
-// Send and receive L2 frames over BLE GATT.
+// Send and receive L2NetStatus frames over BLE GATT.
 // Uses UUID advertisments (eddystone), with Proxy characteristics.
 //
 // Requires BLE support on the device.

@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package l2api.dmesh;
+option go_package = "l2api";
+
+message Status {
+
+    // Number of L2-visible nodes - wifi, BT, BLE, of any type
+    // TODO: should it be a map or indicate the type ?
+    int32 visible = 1;
+
+    // Device local SSID. Empty if device doesn't support P2P or never started.
+    string SSID = 2;
+
+    // PSK, if different from the default.
+    string PSK = 3;
+
+    // AP this node is connected to, or empty if no STA connection.
+    string ConnectedWifi = 4;
+
+    // Wifi Frequency and Level, if device is connected as STA.
+    int32 freq = 5;
+    int32 level = 6;
+
+    repeated Node Scan = 7;
+}
+
+message Node {
+    string SSID = 1;
+    string PSK = 2;
+
+    string MAC = 3;
+
+    string Name = 4;
+
+    int32 Level = 5;
+    int32 Freq = 6;
+
+    string UserAgent = 7;
+
+    string Net = 8;
+
+    string cap = 9;
+    string BSSID = 10;
+
+    uint64 LastSeen = 11;
+
+}
+

@@ -55,43 +55,43 @@ func (c *WifiInterface) onEvent(cmd string, data []byte, isp2pif bool) {
 	case "CTRL-EVENT-CONNECTED":
 		// SME: Trying to authenticate with 32:76:6f:f2:27:da (SSID='DIRECT-Hc-Android_da85' freq=5745 MHz
 		//CTRL-EVENT-CONNECTED - Connection to 32:76:6f:f2:27:da completed [id=135 id_str=]]
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		c.Status()
 
 	case "CTRL-EVENT-DISCONNECTED":
 		//bssid=70:3a:cb:02:2b:3a reason=3 locally_generated=1
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		c.Status()
 
 	case "CTRL-EVENT-SIGNAL-CHANGE":
 		// above=1 signal=-70 noise=9999 txrate=36000"
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 	case "CTRL-EVENT-BSS-ADDED":
 		// 34 00:11:22:33:44:55
 		// entryId MAC
-		//log.Println("WPA_IN: ", p2pif, parts)
+		//log.Println("WPA/IN: ", p2pif, parts)
 
 	case "CTRL-EVENT-BSS-REMOVED":
-		//log.Println("WPA_IN: ", p2pif, parts)
+		//log.Println("WPA/IN: ", p2pif, parts)
 
 	case "P2P-GROUP-REMOVED":
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		c.OnP2PGroupStop(parts)
 
 	case "P2P-GROUP-STARTED":
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		c.OnP2PGroupStart(parts)
 	case "Associated":
 		// with 70:3a:cb:02:2b:3a"
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 	case "Trying":
 		// to associate with 94:44:52:14:2e:b1 (SSID='costin' freq=2437 MHz)
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 	case "P2P-FIND-STOPPED":
 		c.scanning = false
 		// Other apps may set different service discovery params. Leaving one active
 		// results in dups.
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 
 		// Results seems to be sent after this commands times out ? No wait for response maybe,
 		// and have a small delay ?
@@ -110,11 +110,11 @@ func (c *WifiInterface) onEvent(cmd string, data []byte, isp2pif bool) {
 		go c.sendScanResults()
 
 	case "P2P-DEVICE-LOST":
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		// p2p_dev_addr=42:4e:36:8e:5d:e1"
 
 	case "P2P-DEVICE-FOUND":
-		log.Println("WPA_IN: ", p2pif, parts)
+		log.Println("WPA/IN: ", p2pif, parts)
 		c.onP2PDeviceFound(parts)
 
 	case "P2P-SERV-DISC-REQ":
@@ -147,7 +147,7 @@ func (c *WifiInterface) onEvent(cmd string, data []byte, isp2pif bool) {
 			log.Println("DISC: ", p2pif, parts, old)
 		}
 	default:
-		log.Println("WPA_IN_UNKNOWN: ", p2pif, parts)
+		log.Println("WPA/IN: UNKNOWN: ", p2pif, parts)
 	}
 }
 
@@ -537,6 +537,7 @@ func (c *WifiInterface) sendCommandTO(command string, p2p bool, t time.Duration)
 	}
 
 	if t == 0 {
+		log.Println("WPA/CMD: ", command)
 		return "", nil
 	}
 	a := time.After(t)
@@ -544,11 +545,11 @@ func (c *WifiInterface) sendCommandTO(command string, p2p bool, t time.Duration)
 	case resp := <-c.currentCommandResponse:
 		t2 := time.Now()
 		if command != "SCAN_RESULTS" {
-			log.Println("WPA_CMD: ", t2.Sub(t1), command, "->", strings.Trim(resp, "\n"))
+			log.Println("WPA/CMD: ", t2.Sub(t1), command, "->", strings.Trim(resp, "\n"))
 		}
 		return resp, nil
 	case <-a:
-		log.Println("WPA_TIMEOUT", p2p, command)
+		log.Println("WPA/CMD: TIMEOUT", p2p, command)
 		return "", errors.New("Timeout")
 	}
 }

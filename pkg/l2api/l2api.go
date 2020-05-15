@@ -7,24 +7,33 @@ import (
 
 // JSON structures used for broadcasting P2P / mesh device information
 // Save to copy, to avoid a direct dependency on this package.
-
 // The information is extracted from WPA, nan, BLE discovery.
 // May also aggregate LoRA, via ESP32/Lora driver - and in future BT classic and other protocols.
-
-// This uses 'wpgate' package, implementing a webpush encryption and model - as well as an abstraction
+//
+// This packages is using messages/events, using 'wpgate', implementing a webpush encryption, abstraction
 // for message mux and integration with message brokers.
 
 
+// IMPORTANT: the android library and ESP32 app must be updated at the same time.
 
+// See l2_test.go
+// Supported messages ( commands to the library ):
+//
+// Generated messages:
+//
 
 // TODO: proto file
 
 
-// L2 device status and discovery info.
-type L2 struct {
+// L2NetStatus device status and discovery info, sent as body of "/net/status" messages.
+// Sync with android Wifi.sendWifiDiscoveryStatus()
+type L2NetStatus struct {
 	// Visible devices at this moment, according to last scan results.
 	// This only includes discovered P2P devices.
 	Scan []*MeshDevice `json:"scan,omitempty"`
+
+	// Android native Message is currently encoding Scan as a parcelableArrayList, encoded in "data",
+	// and all other elements as string bundle key/value pairs.
 
 	Stats string `json:"stat,omitempty"`
 
@@ -44,7 +53,8 @@ type L2 struct {
 	Level int `json:"l,omitempty"`
 }
 
-// Info about a L2-connected device. Originally used for Android P2P L2 connections.
+// Info about a L2NetStatus-connected device. Originally used for Android P2P L2NetStatus connections.
+// Must be in sync with com.github.costinm.dmesh.lm3.Device
 type MeshDevice struct {
 
 	// If the device has a P2P or AP interface, the SSID and PSK of the device,
