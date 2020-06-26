@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="dmesh-l2" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="dmesh" />
+    <working_directory value="$PROJECT_DIR$/../dmesh-l2" />
+    <sudo value="true" />
+    <kind value="PACKAGE" />
+    <filePath value="$PROJECT_DIR$/../dmesh-l2/dml2.go" />
+    <package value="github.com/costinm/dmesh-l2" />
+    <directory value="$PROJECT_DIR$/.idea/modules" />
+    <method v="2" />
+  </configuration>
+</component>

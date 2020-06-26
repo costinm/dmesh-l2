@@ -4,10 +4,10 @@ go 1.14
 
 replace github.com/google/netstack => github.com/costinm/netstack v0.0.0-20190601172006-f6e50d4d2856
 
-replace github.com/costinm/wpgate => ../wpgate
+//replace github.com/costinm/wpgate => ../wpgate
 
 require (
-	github.com/costinm/wpgate v0.0.0-20200310154919-3cd18aaa0415
+	github.com/costinm/wpgate v0.0.0-20200623045415-3148e94f846a
 	github.com/go-ble/ble v0.0.0-20200120171844-0a73a9da88eb
 	github.com/gogo/protobuf v1.3.1
 	github.com/google/gopacket v1.1.17
