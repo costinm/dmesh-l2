@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 
@@ -66,12 +65,5 @@ func main() {
 
 	// TODO: use h2 transport with certs.
 
-	if "" != os.Getenv("MSG_ADDR") {
-		// allow HTTP interface for messages. If not set, only
-		// msg communication is via UDS, from user 1337 or 0 or UID
-		// Insecure - debug only
-		http.ListenAndServe(os.Getenv("MSG_ADDR"), msgs.DefaultMux.Gate.Mux.ServeMux)
-	} else {
-		select {}
-	}
+	select {}
 }
