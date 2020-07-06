@@ -4,7 +4,7 @@ go 1.14
 
 replace github.com/google/netstack => github.com/costinm/netstack v0.0.0-20190601172006-f6e50d4d2856
 
-//replace github.com/costinm/wpgate => ../wpgate
+replace github.com/costinm/wpgate => ../wpgate
 
 require (
 	github.com/costinm/wpgate v0.0.0-20200623045415-3148e94f846a
@@ -17,5 +17,5 @@ require (
 	github.com/mdlayher/genetlink v1.0.0
 	github.com/mdlayher/netlink v1.1.0
 	github.com/songgao/water v0.0.0-20200317203138-2b4b6d7c09d8
-	golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
 )

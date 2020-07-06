@@ -1,7 +1,7 @@
 package netstacktun
 
 import (
-	"github.com/costinm/wpgate/pkg/bootstrap"
+	"github.com/costinm/wpgate/pkg/bootstrap/tests"
 	"github.com/costinm/wpgate/pkg/h2"
 	"github.com/costinm/wpgate/pkg/mesh"
 
@@ -34,8 +34,8 @@ var (
 func initFakes() {
 	if !fakes {
 		fakes = true
-		go bootstrap.InitEchoServer(":3000")
-		go bootstrap.InitEchoServer(":2000")
+		go tests.InitEchoServer(":3000")
+		go tests.InitEchoServer(":2000")
 	}
 }
 
@@ -62,7 +62,7 @@ func TestTcpCapture(t *testing.T) {
 }
 
 func TestUdpCapture(t *testing.T) {
-	err := bootstrap.InitEchoUdp(2000)
+	err := tests.InitEchoUdp(2000)
 	if err != nil {
 		t.Fatal("UDP proxy", err)
 	}
@@ -225,7 +225,7 @@ func testTcpEcho(t *testing.T, tn *NetstackTun, addr string, port uint16) {
 		t.Fatal("Failed to dial ", err)
 	}
 
-	bootstrap.TcpEchoTest(c1)
+	tests.TcpEchoTest(c1)
 }
 
 func testTcpEcho6(t *testing.T, tn *NetstackTun, port uint16) {

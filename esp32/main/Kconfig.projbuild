@@ -1,0 +1,9 @@
+menu "DMesh Configuration"
+
+    config DUMP_BT
+        bool "Dump BT HCI"
+        default y
+        help
+            If a patched bt_trace.h is used, will show all BT HCI messages.
+
+endmenu

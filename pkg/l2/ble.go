@@ -177,7 +177,7 @@ func (b *BLE) maybeConnect(n *BLENode) error {
 func (n *BLENode) handleCon() {
 	t0 := time.Now()
 	defer func() {
-		n.ble.mux.Gate.RemoveConnection(n.Addr.String(), &n.MsgConnection)
+		n.ble.mux.RemoveConnection(n.Addr.String(), &n.MsgConnection)
 		n.con = nil
 		log.Println("BLE close connection ", n.Addr.String(), time.Since(t0))
 	}()
