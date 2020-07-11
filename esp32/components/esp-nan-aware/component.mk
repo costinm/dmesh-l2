@@ -1,0 +1,5 @@
+# Used with ESP8266 SDK
+COMPONENT_ADD_INCLUDEDIRS := .
+
+
+
