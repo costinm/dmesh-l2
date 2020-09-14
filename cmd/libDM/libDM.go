@@ -19,6 +19,7 @@ import (
 	"github.com/costinm/wpgate/pkg/transport/httpproxy"
 	"github.com/costinm/wpgate/pkg/transport/local"
 	sshgate "github.com/costinm/wpgate/pkg/transport/ssh"
+	"github.com/costinm/wpgate/pkg/transport/udp"
 	uds2 "github.com/costinm/wpgate/pkg/transport/uds"
 	"github.com/costinm/wpgate/pkg/ui"
 )
@@ -92,7 +93,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	initUDSConnection(h2s, GW, ld, config)
+	udpNat  := udp.NewUDPGate(GW)
+	initUDSConnection(GW, ld, config, udpNat)
 
 	hgw := httpproxy.NewHTTPGate(GW, h2s)
 	hgw.HttpProxyCapture("localhost:5204")
@@ -100,16 +102,18 @@ func main() {
 	// Start a basic UI on the debug port
 	u, _ := ui.NewUI(GW, h2s, hgw, ld)
 
+	udpNat.InitMux(h2s.LocalMux)
+
 	//// Periodic registrations.
 	//m.Registry.RefreshNetworksPeriodic()
 
-	log.Printf("Loading with VIP6: %v ID64: %s %s\n", h2s.VIP6,
-		base64.RawURLEncoding.EncodeToString(h2s.Certs.VIP6[8:]))
+	log.Printf("Loading with VIP6: %v ID64: %s %s\n", authz.VIP6,
+		base64.RawURLEncoding.EncodeToString(authz.VIP6[8:]))
 
 	http.ListenAndServe("localhost:5227", u)
 }
 
-func initUDSConnection(h2 *h2.H2, gw *mesh.Gateway, ld *local.LLDiscovery, cfg *conf.Conf) {
+func initUDSConnection(gw *mesh.Gateway, ld *local.LLDiscovery, cfg *conf.Conf, udpNat *udp.UDPGate) {
 
 	var vpn *os.File
 	// Attempt to connect to local UDS socket, to communicate with android app.
@@ -166,8 +170,8 @@ func initUDSConnection(h2 *h2.H2, gw *mesh.Gateway, ld *local.LLDiscovery, cfg *
 						// The dmtun will be passed as a reader when connecting to the VPN.
 						//mesh.Tun = NewTun(fa, fa)
 						link := netstacktun.NewReaderWriterLink(fa, fa, &netstacktun.Options{MTU: 1600})
-						netstack := netstacktun.NewTunCapture(&link, gw, false)
-						gw.UDPWriter = netstack
+						netstack := netstacktun.NewTunCapture(&link, gw, udpNat, false)
+						udpNat.UDPWriter = netstack
 					} else {
 						log.Println("ERR: UDS: VPN TUN: invalid VPN file descriptor (v)")
 					}
@@ -178,8 +182,8 @@ func initUDSConnection(h2 *h2.H2, gw *mesh.Gateway, ld *local.LLDiscovery, cfg *
 					if fa != nil {
 						log.Println("Received VPN UDS master (V), starting VPN DmDns", fa, ucon.Files)
 						link := netstacktun.NewReaderWriterLink(fa, fa, &netstacktun.Options{MTU: 1600})
-						netstack := netstacktun.NewTunCapture(&link, gw, false)
-						gw.UDPWriter = netstack
+						netstack := netstacktun.NewTunCapture(&link, gw, udpNat, false)
+						udpNat.UDPWriter = netstack
 					} else {
 						log.Println("ERR: UDS: invalid VPN file descriptor (V)")
 					}
