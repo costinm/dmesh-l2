@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	"github.com/costinm/dmesh-l2/pkg/netstacktun"
 	"github.com/costinm/wpgate/pkg/auth"
 	"github.com/costinm/wpgate/pkg/conf"
+	"github.com/costinm/wpgate/pkg/dns"
 	"github.com/costinm/wpgate/pkg/h2"
 	"github.com/costinm/wpgate/pkg/mesh"
 	"github.com/costinm/wpgate/pkg/msgs"
@@ -24,8 +26,7 @@ import (
 	"github.com/costinm/wpgate/pkg/ui"
 )
 
-// Android version of DMesh.
-//
+// Android and device version of DMesh.
 func main() {
 	log.Print("Starting native process pwd=", os.Getenv("PWD"), os.Environ())
 
@@ -94,10 +95,17 @@ func main() {
 	}
 
 	udpNat  := udp.NewUDPGate(GW)
-	initUDSConnection(GW, ld, config, udpNat)
+	go initUDSConnection(GW, ld, config, udpNat)
 
 	hgw := httpproxy.NewHTTPGate(GW, h2s)
 	hgw.HttpProxyCapture("localhost:5204")
+
+	dnss, err := dns.NewDmDns(5223)
+	go dnss.Serve()
+	GW.DNS = dnss
+	net.DefaultResolver.PreferGo = true
+	net.DefaultResolver.Dial = dns.DNSDialer(5223)
+
 
 	// Start a basic UI on the debug port
 	u, _ := ui.NewUI(GW, h2s, hgw, ld)
@@ -107,10 +115,14 @@ func main() {
 	//// Periodic registrations.
 	//m.Registry.RefreshNetworksPeriodic()
 
-	log.Printf("Loading with VIP6: %v ID64: %s %s\n", authz.VIP6,
+	log.Printf("Loading with VIP6: %v ID64: %s\n",
+		authz.VIP6,
 		base64.RawURLEncoding.EncodeToString(authz.VIP6[8:]))
 
-	http.ListenAndServe("localhost:5227", u)
+	err = http.ListenAndServe("localhost:5227", u)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func initUDSConnection(gw *mesh.Gateway, ld *local.LLDiscovery, cfg *conf.Conf, udpNat *udp.UDPGate) {

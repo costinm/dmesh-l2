@@ -1,7 +1,7 @@
 package netstacktun
 
 import (
-	"github.com/costinm/wpgate/pkg/bootstrap/tests"
+	"github.com/costinm/wpgate/pkg/tests"
 	"github.com/costinm/wpgate/pkg/h2"
 	"github.com/costinm/wpgate/pkg/mesh"
 

@@ -14,9 +14,6 @@ import (
 // from the rest.
 //
 // Will handle tun, iptables, routing - as well as BT and WifiInterface.
-// DMesh can also run as root or with CAP_NET - but for debugging in IDE it is
-// easier to use dmroot, and it is also more secure.
-// If using ufw, run "ufw allow 67/udp"
 //
 // mips: 6.4M (12M for dmesh) before including dmesh
 func main() {
@@ -63,7 +60,8 @@ func main() {
 	// TODO: start dmesh iw interface if possible.
 	// TODO: start ap
 
-	// TODO: use h2 transport with certs.
+	// TODO: use h2 transport ?
 
 	select {}
 }
+

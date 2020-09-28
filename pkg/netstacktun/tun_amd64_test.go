@@ -41,7 +41,7 @@ func TestTcpCaptureReal(t *testing.T) {
 	tp := mesh.New(h21.Certs, nil)
 
 	linkID := NewReaderWriterLink(fd, fd, &Options{MTU: 1600})
-	tun := NewTunCapture(&linkID, tp, true)
+	tun := NewTunCapture(&linkID, tp,nil, true)
 
 	t.Run("external", func(t *testing.T) {
 		testTcpEchoLocal(t, tun, "www.webinf.info", 5227)
