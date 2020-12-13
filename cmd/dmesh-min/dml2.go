@@ -14,8 +14,6 @@ import (
 // from the rest.
 //
 // Will handle tun, iptables, routing - as well as BT and WifiInterface.
-// DMesh can also run as root or with CAP_NET.
-// If using ufw, run "ufw allow 67/udp"
 //
 // mips: 6.4M (12M for dmesh) before including dmesh
 func main() {
@@ -66,3 +64,4 @@ func main() {
 
 	select {}
 }
+

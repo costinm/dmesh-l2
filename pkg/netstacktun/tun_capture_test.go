@@ -1,7 +1,7 @@
 package netstacktun
 
 import (
-	"github.com/costinm/wpgate/pkg/bootstrap/tests"
+	"github.com/costinm/wpgate/pkg/tests"
 	"github.com/costinm/wpgate/pkg/h2"
 	"github.com/costinm/wpgate/pkg/mesh"
 
@@ -49,7 +49,7 @@ func TestTcpCapture(t *testing.T) {
 	h21, _ := h2.NewH2("")
 	tp := mesh.New(h21.Certs, nil)
 
-	tun := NewTunCapture(&link, tp, true)
+	tun := NewTunCapture(&link, tp, nil, true)
 
 	t.Run("v4", func(t *testing.T) {
 		testTcpEcho(t, tun, "127.0.0.1", 3000)
@@ -69,14 +69,14 @@ func TestUdpCapture(t *testing.T) {
 
 	// init link, lr, lw
 	initPipeLink()
-	tc := NewTunCapture(&link, nil, true)
+	tc := NewTunCapture(&link, nil, nil, true)
 
 	h21, _ := h2.NewH2("")
 	tp := mesh.New(h21.Certs, nil)
 
 	tc.Handler = tp
 
-	tp.UDPWriter = tc
+	//tp.UDPWriter = tc
 
 	//addr1 := make([]byte, 16)
 	//addr1[15] = 1

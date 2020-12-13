@@ -1,6 +1,7 @@
 package netstacktun
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log"
@@ -34,20 +35,21 @@ type NetstackTun struct {
 	DefTCP tcpip.Endpoint
 
 	Handler Gateway
+	UDPHandler UDPGateway
 
 	udpPacketConn net.PacketConn
 }
 
-type StreamProxy interface {
-	Dial(dest string, addr *net.TCPAddr) error
-	Proxy() error
-	Close() error
+// Interface implemented by Gateway.
+type UDPGateway interface {
+	HandleUdp(dstAddr net.IP, dstPort uint16, localAddr net.IP, localPort uint16, data []byte)
 }
 
 // Interface implemented by Gateway.
 type Gateway interface {
-	HandleUdp(dstAddr net.IP, dstPort uint16, localAddr net.IP, localPort uint16, data []byte)
-	NewStream(addr net.IP, port uint16, ctype string, initialData []byte, clientIn io.ReadCloser, clientOut io.Writer) interface{}
+	DialProxy(ctx context.Context,
+			addr net.Addr, directClientAddr *net.TCPAddr,
+			ctype string, meta ...string) (net.Conn, func(client net.Conn) error, error)
 }
 
 /*
@@ -184,10 +186,11 @@ func OpenTun(ifn string) (io.ReadWriteCloser, error) {
 
 // NewTunCapture creates an in-process tcp stack, backed by an tun-like network interface.
 // All TCP streams initiated on the tun or localhost will be captured.
-func NewTunCapture(ep *tcpip.LinkEndpointID, handler Gateway, snif bool) *NetstackTun {
+func NewTunCapture(ep *tcpip.LinkEndpointID, handler Gateway, udpNat UDPGateway, snif bool) *NetstackTun {
 	t := &NetstackTun{}
 
 	t.Handler = handler
+	t.UDPHandler = udpNat
 
 	t.IPStack = stack.New([]string{ipv4.ProtocolName, ipv6.ProtocolName, arp.ProtocolName},
 		[]string{tcp.ProtocolName, udp.ProtocolName}, stack.Options{})
@@ -343,10 +346,11 @@ func (nt *NetstackTun) defUdpServer() error {
 			}
 
 			la := net.IP([]byte(add.LocalAddr))
-			nt.Handler.HandleUdp(la, add.LocalPort,
-				net.IP([]byte(add.FullAddress.Addr)), add.FullAddress.Port,
-				v)
-
+			if nt.UDPHandler != nil {
+				nt.UDPHandler.HandleUdp(la, add.LocalPort,
+					net.IP([]byte(add.FullAddress.Addr)), add.FullAddress.Port,
+					v)
+			}
 		}
 	}()
 
@@ -399,9 +403,11 @@ func (nt *NetstackTun) defUdp6Server() error {
 				continue
 			}
 
-			nt.Handler.HandleUdp(la, add.LocalPort,
-				net.IP([]byte(add.FullAddress.Addr)), add.FullAddress.Port,
-				v)
+			if nt.UDPHandler != nil {
+				nt.UDPHandler.HandleUdp(la, add.LocalPort,
+					net.IP([]byte(add.FullAddress.Addr)), add.FullAddress.Port,
+					v)
+			}
 
 		}
 	}()
@@ -465,13 +471,13 @@ func DefTcpServer(nt *NetstackTun, handler Gateway) (tcpip.Endpoint, waiter.Queu
 			}
 			go func() {
 				ra, _ := epin.GetRemoteAddress()
-				proxy := handler.NewStream(a2na(ra.Addr), ra.Port, "TUN", nil, conn, conn).(StreamProxy)
-				defer proxy.Close()
-				err := proxy.Dial("", &net.TCPAddr{Port: int(la.Port), IP: net.IP([]byte(la.Addr))})
+				_, proxy, err := handler.DialProxy(context.Background(),
+					&net.TCPAddr{Port: int(la.Port), IP: net.IP([]byte(la.Addr))},
+					&net.TCPAddr{Port:int(ra.Port), IP:a2na(ra.Addr)}, "TUN")
 				if err != nil {
 					return
 				}
-				proxy.Proxy()
+				proxy(conn)
 			}()
 
 		}
@@ -533,14 +539,13 @@ func DefTcp6Server(nt *NetstackTun, handler Gateway) (tcpip.Endpoint, waiter.Que
 			}
 			go func() {
 				ra, _ := epin.GetRemoteAddress()
-				proxy := handler.NewStream(a2na(ra.Addr), ra.Port, "TUN", nil, conn, conn).(StreamProxy)
-				defer proxy.Close()
-				err := proxy.Dial("", &net.TCPAddr{Port: int(la.Port), IP: net.IP([]byte(la.Addr))})
+				_, proxy, err := handler.DialProxy(context.Background(),
+					&net.TCPAddr{Port: int(la.Port), IP: net.IP([]byte(la.Addr))},
+					&net.TCPAddr{Port:int(ra.Port), IP:a2na(ra.Addr)}, "TUN")
 				if err != nil {
 					return
 				}
-				proxy.Proxy()
-
+				proxy(conn)
 			}()
 
 		}
