@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/costinm/wpgate/pkg/mesh"
-	"github.com/costinm/wpgate/pkg/msgs"
+	mesh "github.com/costinm/ugate"
+	msgs "github.com/costinm/ugate/webpush"
 
 	"log"
 	"net/http"

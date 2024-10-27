@@ -5,9 +5,8 @@ import (
 	"log"
 	"testing"
 
-	"github.com/costinm/wpgate/pkg/mesh"
-	"github.com/costinm/wpgate/pkg/msgs"
-	uds2 "github.com/costinm/wpgate/pkg/transport/uds"
+	mesh "github.com/costinm/ugate"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 // Assumes the devices have a stable connection to the mesh - primary Wifi for Q or devices allowing client P2P,

@@ -14,7 +14,7 @@ import (
 	"time"
 
 	mesh "github.com/costinm/dmesh-l2/pkg/l2api"
-	"github.com/costinm/wpgate/pkg/msgs"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 // Implements the interface with wpa_supplicant on Linux devices, mirroring the Android protocol and features.

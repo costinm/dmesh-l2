@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/costinm/wpgate/pkg/mesh"
-	"github.com/costinm/wpgate/pkg/msgs"
-	"github.com/costinm/wpgate/pkg/transport/local"
+	mesh "github.com/costinm/dmesh-l2/pkg/l2api"
+	"github.com/costinm/ugate/pkg/local"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 // Wifi package interacts with platform or remote Wifi interfaces, keeps track of visible AP and
@@ -31,7 +31,6 @@ type MeshInfo struct {
 // The actual low level implementation is part of the native android app, or a separate process
 // running as root (or net_admin CAP) and using WPA directly. Messages are used to communicate with the
 // real wifi implementation.
-//
 type Wifi struct {
 	Mesh *local.LLDiscovery
 
@@ -77,7 +76,6 @@ func (a ByLevel) Less(i, j int) bool { return a[i].Level < a[j].Level }
 
 // Message from the wpa layer:
 // /wifi/status
-//
 func (wifi *Wifi) HandleMessage(ctx context2.Context, cmdS string, meta map[string]string, data []byte) {
 	cmd := strings.Split(cmdS, "/")
 	if len(cmd) < 2 || (cmd[1] != "wifi" && cmd[1] != "net") {

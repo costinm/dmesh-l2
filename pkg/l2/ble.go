@@ -8,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/costinm/wpgate/pkg/msgs"
+	msgs "github.com/costinm/ugate/webpush"
 
 	"github.com/go-ble/ble"
 	"github.com/go-ble/ble/linux"

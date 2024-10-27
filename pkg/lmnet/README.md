@@ -1,6 +1,7 @@
 # Interface with low-level local mesh network
 
-Communication uses messages. 
+Communicates using messages with a trusted app handling the low-level scan/connect - android app or app running
+as root.
 
 The driver subscribes to the /wifi topic, and receives messages setting the desired state and commands.
 Implementation uses Android Wifi, BLE, BT and NAN, exposing discovery, connection, messages.

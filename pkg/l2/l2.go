@@ -5,7 +5,7 @@ import (
 
 	"github.com/costinm/dmesh-l2/pkg/l2/wifi"
 	"github.com/costinm/dmesh-l2/pkg/l2api"
-	"github.com/costinm/wpgate/pkg/msgs"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 type L2 struct {

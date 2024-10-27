@@ -10,8 +10,7 @@ import (
 	"time"
 
 	"github.com/costinm/dmesh-l2/pkg/l2api"
-	"github.com/costinm/wpgate/pkg/msgs"
-	uds2 "github.com/costinm/wpgate/pkg/transport/uds"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 // Some machines have BLE, other WifiDirect - but it seems emulated WifiAware is more common on

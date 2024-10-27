@@ -13,7 +13,7 @@ import (
 	mesh "github.com/costinm/dmesh-l2/pkg/l2api"
 
 	//"github.com/costinm/dmesh/dm/mesh"
-	"github.com/costinm/wpgate/pkg/msgs"
+	msgs "github.com/costinm/ugate/webpush"
 )
 
 // Wifi network info - list of networks registered.
